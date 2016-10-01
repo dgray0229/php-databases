@@ -32,55 +32,64 @@ if (empty($current_page)) {
 }
 
 $total_items = get_catalog_count($section, $search);
-$total_pages = ceil($total_items / $items_per_page);
+$total_pages = 1;
+$offset = 0;
+if ($total_items > 0) {
+    $total_pages = ceil($total_items / $items_per_page);
 
-// Limit results in redirect
-$limit_results = "";
-if (!empty($section)) {
-    $limit_results = "cat=" . $section . "&";
+    // Limit results in redirect
+    $limit_results = "";
+    if (!empty($search)) {
+        $limit_results = "s=".urlencode(htmlspecialchars($search))."&";
+    } 
+    if (!empty($section)) {
+        $limit_results = "cat=" . $section . "&";
+    }
+
+    // Redirect too-large page numbers to the last page
+    if ($current_page > $total_pages) {
+        header("location:catalog.php?"
+        . $limit_results
+        . "pg=".$total_pages);
+    }
+    // Redirect too-small page numbers to the first page
+    if ($current_page < 1) {
+        header("location:catalog.php?"
+        . $limit_results
+        . "pg=1"
+        );
+    }
+    // Determine the offset (number of iterms to skip) for the current page
+    //i.e. on page 3 with 8 items per page, the offset would be 16
+
+    $offset = ($current_page - 1) * $items_per_page;
+
+    $pagination = "<div class=\"pagination\">";
+    $pagination .= "<span>Pages:</span>";
+
+    for ($i = 1; $i <= $total_pages; $i++) {
+        if ($i == $current_page) {
+            $pagination .= " <span>$i</span>";
+        } else {
+            $pagination .= " <a href='catalog.php?";
+            if (!empty($search)) {
+                $pagination .= "s=".urlencode(htmlspecialchars($search))."&";
+            } else if (!empty($section)) {
+                $pagination .= "cat=".$section."&";
+            }
+            $pagination .= "pg=$i'>$i</a>";
+        }
+    }
+    $pagination .= "</div>";
+
 }
-
-// Redirect too-large page numbers to the last page
-if ($current_page > $total_pages) {
-    header("location:catalog.php?"
-    . $limit_results
-    . "pg=".$total_pages);
-}
-// Redirect too-small page numbers to the first page
-if ($current_page < 1) {
-    header("location:catalog.php?"
-    . $limit_results
-    . "pg=1"
-    );
-}
-// Determine the offset (number of iterms to skip) for the current page
-//i.e. on page 3 with 8 items per page, the offset would be 16
-
-$offset = ($current_page - 1) * $items_per_page;
-
-if (empty($search)) {
-    $catalog = search_catalog_array($search, $items_per_page, $offset)
+if (!empty($search)) {
+    $catalog = search_catalog_array($search, $items_per_page, $offset);
 } else if (empty($section)) {
     $catalog = full_catalog_array($items_per_page, $offset);
 } else {
     $catalog = category_catalog_array($section, $items_per_page, $offset);
 }
-
-$pagination = "<div class=\"pagination\">";
-$pagination .= "<span>Pages:</span>";
-
-for ($i = 1; $i <= $total_pages; $i++) {
-    if ($i == $current_page) {
-        $pagination .= " <span>$i</span>";
-    } else {
-        $pagination .= " <a href='catalog.php?";
-        if (!empty($section)) {
-            $pagination .= "cat=".$section."&";
-        }
-        $pagination .= "pg=$i'>$i</a>";
-    }
-}
-$pagination .= "</div>";
 
 include("inc/header.php"); ?>
 
@@ -89,16 +98,28 @@ include("inc/header.php"); ?>
     <div class="wrapper">
 
       <h1><?php
-if ($section != null) {
-    echo "<a href='catalog.php'>Full Catalog</a> &gt; ";
-}
+      if ($search != null) {
+          echo "Search Results for \"" . htmlspecialchars($search) . "\" ";
+      } else {
+        if ($section != null) {
+            echo "<a href='catalog.php'>Full Catalog</a> &gt; ";
+        }
+      }
 echo $pageTitle; ?></h1>
-      <?php echo $pagination; ?>
+      <?php
+      if ($total_items < 1) {
+          echo "<p>No items were found matching that search term.";
+          echo "<p>Search Again or "
+          . "<a href=\"catalog.php\">Browse the Full Catalog</a></p>";
+      } else {
+       echo $pagination; ?>
         <ul class="items">
+
           <?php
-foreach ($catalog as $item) {
-    echo get_item_html($item);
-}
+        foreach ($catalog as $item) {
+            echo get_item_html($item);
+        }
+      }
 ?>
         </ul>
         <?php echo $pagination; ?>
