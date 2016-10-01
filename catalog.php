@@ -31,7 +31,7 @@ if (empty($current_page)) {
     $current_page = 1;
 }
 
-$total_items = get_catalog_count($section);
+$total_items = get_catalog_count($section, $search);
 $total_pages = ceil($total_items / $items_per_page);
 
 // Limit results in redirect
@@ -58,7 +58,9 @@ if ($current_page < 1) {
 
 $offset = ($current_page - 1) * $items_per_page;
 
-if (empty($section)) {
+if (empty($search)) {
+    $catalog = search_catalog_array($search, $items_per_page, $offset)
+} else if (empty($section)) {
     $catalog = full_catalog_array($items_per_page, $offset);
 } else {
     $catalog = category_catalog_array($section, $items_per_page, $offset);
