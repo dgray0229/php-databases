@@ -15,7 +15,7 @@ try {
     $db = new PDO(
         "mysql:host=$HOST;
         dbname=$DATABASE",
-        $USER, $PASS
+        $USER, $PASS, $OPTIONS
     );
 } catch (Exception $e) {
   echo "Unable to connect";
