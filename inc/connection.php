@@ -2,7 +2,6 @@
 
 try {
     $URL = getenv('JAWSDB_URL');
-    var_dump($URL);
     $dbparts = parse_url($HOST);
 
     $HOST = $dbparts['host'];
