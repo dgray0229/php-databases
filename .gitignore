@@ -4,3 +4,4 @@
 /.vscode/
 /vendor/
 database.sql
+.env
