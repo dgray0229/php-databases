@@ -9,7 +9,7 @@ try {
     $url = 'mysql:host='.$host.'; dbname='.$jawsdb;
 
     $db = new PDO($url, $user, $pass);
-  $db->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
+    $db->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
   echo "Unable to connect.<br />";
   echo $e->getMessage();
