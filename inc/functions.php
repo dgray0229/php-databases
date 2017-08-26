@@ -22,9 +22,10 @@ function get_catalog_count($category = null,$search = null) {
         }
         $result->execute();
     } catch (Exception $e) {
-      echo "bad query";
+      echo "bad query: <br />";
+      echo $e->getMessage();
     }
-  
+
   $count = $result->fetchColumn(0);
   return $count;
 }
@@ -141,7 +142,7 @@ function random_catalog_array() {
        $results = $db->query(
          "SELECT media_id, title, category,img 
          FROM Media
-         ORDER BY RANDOM()
+         ORDER BY RAND()
          LIMIT 4"
        );
     } catch (Exception $e) {
@@ -163,28 +164,30 @@ function single_item_array($id) {
           FROM Media
           JOIN Genres ON Media.genre_id=Genres.genre_id
           LEFT OUTER JOIN Books 
-          ON Media.media_id = Books.media_id:
+          ON Media.media_id = Books.media_id
           WHERE Media.media_id = ?"
       );
       $results->bindParam(1,$id,PDO::PARAM_INT);
       $results->execute();
     } catch (Exception $e) {
-      echo "bad query";
+      echo "bad query: <br />";
+      echo $e->getMessage();
       echo $e;
     }
 
     $item = $results->fetch(PDO::FETCH_ASSOC);
 
     try {
-      $result = $db->prepare("
-              SELECT fullname,role
+      $result = $db->prepare(
+              "SELECT fullname,role
               FROM Media_People
               JOIN People ON Media_People.people_id=People.people_id
               WHERE media_id = ?");
       $result->bindParam(1,$id,PDO::PARAM_INT);
       $result->execute();
     } catch (Exception $e) {
-      echo "bad query";
+      echo "bad query: <br />";
+      echo $e->getMessage();
       echo $e;
     }
     while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -212,7 +215,8 @@ function genre_array($category = null) {
     }
     $results->execute();
   } catch (Exception $e) {
-    echo "bad query";
+    echo "bad query: <br />";
+    echo $e->getMessage();
   }
   $genres = array();
   while ($row = $results->fetch(PDO::FETCH_ASSOC)) {
