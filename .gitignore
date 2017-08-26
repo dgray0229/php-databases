@@ -1,6 +1,5 @@
 /vendor/
 /database_2017-01-02.sql
-.env
 /.idea/
 /.vscode/
 /vendor/
