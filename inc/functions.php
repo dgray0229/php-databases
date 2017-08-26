@@ -54,10 +54,11 @@ function full_catalog_array($limit = null, $offset = 0) {
        }
        $results->execute();
     } catch (Exception $e) {
-       echo "Unable to retrieved results";
+       echo "Unable to retrieve results: <br />";
+       echo $e->getMessage();
        exit;
     }
-    
+
     $catalog = $results->fetchAll();
     return $catalog;
 }
@@ -89,16 +90,17 @@ function category_catalog_array($category, $limit = null, $offset = 0) {
        }
        $results->execute();
     } catch (Exception $e) {
-       echo "Unable to retrieved results";
+       echo "Unable to retrieve results: <br />";
+       echo $e->getMessage();
        exit;
     }
-    
+
     $catalog = $results->fetchAll();
     return $catalog;
 }
 function search_catalog_array($search, $limit = null, $offset = 0) {
     include("connection.php");
-    
+
     try {
        $sql = "SELECT media_id, title, category,img 
          FROM Media
@@ -124,10 +126,11 @@ function search_catalog_array($search, $limit = null, $offset = 0) {
        }
        $results->execute();
     } catch (Exception $e) {
-       echo "Unable to retrieved results";
+       echo "Unable to retrieve results: <br />";
+       echo $e->getMessage();
        exit;
     }
-    
+
     $catalog = $results->fetchAll();
     return $catalog;
 }
@@ -142,10 +145,11 @@ function random_catalog_array() {
          LIMIT 4"
        );
     } catch (Exception $e) {
-       echo "Unable to retrieved results";
+       echo "Unable to retrieve results: <br />";
+       echo $e->getMessage();
        exit;
     }
-    
+
     $catalog = $results->fetchAll();
     return $catalog;
 }
@@ -159,7 +163,7 @@ function single_item_array($id) {
           FROM Media
           JOIN Genres ON Media.genre_id=Genres.genre_id
           LEFT OUTER JOIN Books 
-          ON Media.media_id = Books.media_id
+          ON Media.media_id = Books.media_id:
           WHERE Media.media_id = ?"
       );
       $results->bindParam(1,$id,PDO::PARAM_INT);
@@ -168,9 +172,9 @@ function single_item_array($id) {
       echo "bad query";
       echo $e;
     }
-    
+
     $item = $results->fetch(PDO::FETCH_ASSOC);
-  
+
     try {
       $result = $db->prepare("
               SELECT fullname,role
@@ -192,14 +196,14 @@ function single_item_array($id) {
 function genre_array($category = null) {
   $category = strtolower($category);
   include("connection.php");
-  
+
   try {
     $sql = "SELECT genre, category"
       . " FROM Genres "
       . " JOIN Genre_Categories "
       . " ON Genres.genre_id = Genre_Categories.genre_id ";
     if (!empty($category)) {
-      $results = $db->prepare($sql 
+      $results = $db->prepare($sql
           . " WHERE LOWER(category) = ?"
           . " ORDER BY genre");
       $results->bindParam(1,$category,PDO::PARAM_STR);

@@ -2,13 +2,16 @@
 
 try {
 //  $db = new PDO("sqlite:".__DIR__."/database.db");
-    $server = getenv('JAWSDB_URL');
+    $host = getenv('HOST');
     $user = getenv('USERNAME');
     $pass = getenv('PASSWORD');
-    $db = new PDO($server, $user, $pass);
+    $jawsdb = getenv('DB');
+    $url = 'mysql:host='.$host.'; dbname='.$jawsdb;
+
+    $db = new PDO($url, $user, $pass);
   $db->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-  echo "Unable to connect";
-  //echo $e->getMessage();
+  echo "Unable to connect.<br />";
+  echo $e->getMessage();
   exit;
 }
